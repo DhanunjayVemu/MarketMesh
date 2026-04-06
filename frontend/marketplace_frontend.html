@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MarketMesh — Community Marketplace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue-dark:rgb(17,24,39);--blue:rgb(31,41,55);--sand:rgb(56,189,248);--orange:rgb(251,146,60);
+  --red:var(--orange);--red-dk:rgb(194,65,12);--red-lt:rgba(251,146,60,.2);
+  --orange-lt:rgba(251,146,60,.2);
+  --yellow:rgb(125,211,252);--yellow-lt:rgba(125,211,252,.2);
+  --green:var(--sand);--green-lt:rgba(56,189,248,.2);--green-dk:rgb(14,116,144);
+  --ink:rgb(224,242,254);--ink-2:rgba(224,242,254,.9);--ink-3:rgba(186,230,253,.72);
+  --paper:rgba(15,23,42,.96);--paper-2:rgba(30,41,59,.86);--paper-3:rgba(56,189,248,.2);--border:rgba(125,211,252,.24);
+  --sb-bg:rgba(15,23,42,.96);--sb-hover:rgba(56,189,248,.18);--sb-active:rgba(56,189,248,.24);
+  --sb-text:var(--ink);--sb-muted:rgba(186,230,253,.72);--sb-border:rgba(125,211,252,.2);
+  --radius:10px;--radius-lg:16px;
+  --shadow:0 10px 24px rgba(2,6,23,.28);--shadow-lg:0 22px 55px rgba(2,6,23,.5);
+  --ff-head:'DM Serif Display',Georgia,serif;
+  --ff-body:'DM Sans',system-ui,sans-serif;
+  --sidebar-w:248px;--panel-w:330px;--topbar-h:58px;
+}
+html,body{height:100%;background:radial-gradient(1200px 700px at 20% -10%, rgba(56,189,248,.18), transparent 55%),radial-gradient(1000px 650px at 95% 0%, rgba(251,146,60,.16), transparent 52%),var(--paper);color:var(--ink);font-family:var(--ff-body);font-size:14px;line-height:1.6}
+
+/* LOGIN */
+#login-screen{position:fixed;inset:0;z-index:9000;background:radial-gradient(circle at top, rgba(56,189,248,.22), transparent 35%),linear-gradient(135deg, rgb(17,24,39), rgb(30,41,59) 55%, rgb(15,23,42));display:flex;align-items:center;justify-content:center;overflow:hidden}
+#login-screen.hidden{display:none}
+.login-box{position:relative;background:rgba(15,23,42,.42);backdrop-filter:blur(22px) saturate(140%);-webkit-backdrop-filter:blur(22px) saturate(140%);border:1px solid rgba(125,211,252,.28);border-radius:28px;padding:44px 40px 36px;width:420px;max-width:95vw;box-shadow:0 28px 90px rgba(2,6,23,.6),inset 0 1px 0 rgba(255,255,255,.08);animation:popIn .3s cubic-bezier(.34,1.56,.64,1) both;overflow:hidden}
+.login-box::before{content:'';position:absolute;inset:-2px;border-radius:inherit;background:linear-gradient(135deg, rgba(125,211,252,.24), rgba(251,146,60,.08), transparent 62%);pointer-events:none;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);padding:1px;opacity:.7}
+.login-box::after{content:'';position:absolute;inset:auto -20% -35% -20%;height:140px;background:radial-gradient(circle, rgba(56,189,248,.24), transparent 65%);filter:blur(16px);pointer-events:none}
+@keyframes popIn{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
+.login-logo{text-align:center;margin-bottom:26px}
+.login-logo h1{font-family:var(--ff-head);font-size:38px;font-style:italic;color:var(--red);letter-spacing:-.5px}
+.login-logo p{font-size:13px;color:var(--ink-3);margin-top:2px}
+.login-tabs{display:flex;background:rgba(30,41,59,.56);border:1px solid rgba(125,211,252,.18);border-radius:var(--radius);padding:3px;margin-bottom:22px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.login-tab{flex:1;padding:8px;border:none;background:none;font-family:var(--ff-body);font-size:13px;font-weight:500;color:rgba(224,242,254,.72);border-radius:8px;cursor:pointer;transition:all .15s}
+.login-tab.active{background:rgba(56,189,248,.14);color:var(--ink);box-shadow:0 8px 20px rgba(2,6,23,.22)}
+.login-form{display:flex;flex-direction:column;gap:13px}
+.login-form.hidden{display:none}
+.lf-group label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--ink-2);margin-bottom:5px}
+.lf-group input{width:100%;padding:11px 14px;border:1.5px solid rgba(125,211,252,.2);border-radius:var(--radius);background:rgba(30,41,59,.62);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-family:var(--ff-body);font-size:14px;color:var(--ink);outline:none;transition:border-color .2s,background .2s,box-shadow .2s}
+.lf-group input:focus{border-color:rgba(56,189,248,.75);background:rgba(30,41,59,.78);box-shadow:0 0 0 3px rgba(56,189,248,.12)}
+.btn-login{padding:13px;background:var(--red);color:var(--sb-text);border:none;border-radius:var(--radius);font-family:var(--ff-body);font-size:14px;font-weight:600;cursor:pointer;transition:background .2s}
+.btn-login:hover{background:var(--red-dk)}
+.login-meta{font-size:12px;color:var(--ink-3);text-align:center}
+.login-meta a{color:var(--orange);text-decoration:none;cursor:pointer;font-weight:500}
+.login-meta a:hover{text-decoration:underline}
+.login-demo{margin-top:18px;padding-top:18px;border-top:1px solid rgba(125,211,252,.18);font-size:12px;color:var(--ink-3);text-align:center}
+.demo-accounts{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap;justify-content:center}
+.demo-chip{padding:4px 12px;border-radius:20px;background:rgba(56,189,248,.12);border:1px solid rgba(125,211,252,.22);font-size:11px;color:var(--ink-2);cursor:pointer;transition:all .15s;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.demo-chip:hover{background:rgba(56,189,248,.22);border-color:rgba(125,211,252,.45);color:var(--ink)}
+.db-badge{display:flex;align-items:center;gap:6px;margin-top:14px;padding:8px 12px;background:rgba(15,23,42,.5);border:1px solid rgba(125,211,252,.16);border-radius:8px;font-size:11px;color:var(--sb-text);font-family:'Courier New',monospace;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.db-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+
+/* APP */
+#app{display:flex;height:100vh;overflow:hidden;background:radial-gradient(circle at top left, rgba(56,189,248,.08), transparent 30%),radial-gradient(circle at bottom right, rgba(251,146,60,.05), transparent 28%),linear-gradient(135deg, rgb(15,23,42), rgb(17,24,39) 55%, rgb(2,6,23))}
+#app.hidden{display:none}
+
+/* SIDEBAR */
+#sidebar{width:var(--sidebar-w);background:rgba(15,23,42,.42);backdrop-filter:blur(22px) saturate(140%);-webkit-backdrop-filter:blur(22px) saturate(140%);border-right:1px solid rgba(125,211,252,.16);color:var(--sb-text);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--sb-border) transparent;box-shadow:inset -1px 0 0 rgba(255,255,255,.04),0 18px 50px rgba(2,6,23,.28)}
+#sidebar-logo{padding:18px 18px 14px;border-bottom:1px solid var(--sb-border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+#sidebar-logo h1{font-family:var(--ff-head);font-size:22px;color:var(--yellow);font-style:italic}
+#sidebar-logo small{font-size:10px;opacity:.4;letter-spacing:.5px;text-transform:uppercase;display:block}
+.user-pill{display:flex;align-items:center;gap:10px;padding:10px 14px;margin:8px 10px;background:var(--sb-active);border-radius:var(--radius)}
+.user-pill-avatar{width:30px;height:30px;border-radius:50%;background:var(--red);color:var(--sb-text);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.user-pill-info{min-width:0;flex:1}
+.user-pill-name{font-size:12px;font-weight:600;color:var(--sb-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-pill-role{font-size:10px;color:var(--sb-muted)}
+.btn-logout{background:none;border:none;color:var(--sb-muted);cursor:pointer;font-size:15px;padding:2px 4px;transition:color .15s;line-height:1}
+.btn-logout:hover{color:var(--yellow)}
+.sidebar-section{padding:10px 0 4px}
+.sidebar-label{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--sb-muted);padding:0 18px 6px;display:flex;align-items:center;justify-content:space-between}
+.sidebar-label-btn{background:none;border:1px solid var(--sb-border);color:var(--sb-muted);border-radius:5px;padding:1px 7px;font-size:14px;cursor:pointer;transition:all .15s;line-height:1.4}
+.sidebar-label-btn:hover{background:var(--red);border-color:var(--red);color:var(--sb-text)}
+.comm-item{display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer;border-left:3px solid transparent;transition:background .15s,border-color .15s,box-shadow .15s;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);background:rgba(56,189,248,.12);border:1px solid rgba(125,211,252,.18);margin:0 10px 7px;border-radius:10px}
+.comm-item:hover{background:rgba(56,189,248,.2);box-shadow:0 8px 20px rgba(2,6,23,.25)}
+.comm-item.active{background:rgba(56,189,248,.28);border-left-color:var(--red)}
+.comm-item.active .comm-name{color:var(--yellow)}
+.comm-icon{width:32px;height:32px;border-radius:8px;background:var(--orange);color:var(--sb-text);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.comm-info{min-width:0}
+.comm-name{font-size:13px;font-weight:500;color:var(--sb-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.comm-meta{font-size:10px;color:var(--sb-muted)}
+.sidebar-footer{padding:12px 14px 16px;margin-top:auto;border-top:1px solid var(--sb-border)}
+.sidebar-btn{width:100%;padding:10px;border:none;border-radius:var(--radius);background:var(--red);color:var(--sb-text);font-family:var(--ff-body);font-size:13px;font-weight:600;cursor:pointer;transition:background .2s}
+.sidebar-btn:hover{background:var(--red-dk)}
+
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+#topbar{height:var(--topbar-h);background:rgba(15,23,42,.42);backdrop-filter:blur(18px) saturate(135%);-webkit-backdrop-filter:blur(18px) saturate(135%);border-bottom:1px solid rgba(125,211,252,.14);display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0;box-shadow:0 10px 30px rgba(2,6,23,.16)}
+#topbar-title{font-family:var(--ff-head);font-size:20px;color:var(--ink);font-style:italic;white-space:nowrap}
+#topbar-meta{font-size:12px;color:var(--ink-3);margin-left:4px;flex:1}
+.search-wrap{position:relative;flex:1;max-width:360px}
+.search-wrap input{width:100%;padding:8px 14px 8px 36px;background:rgba(30,41,59,.58);border:1.5px solid rgba(125,211,252,.18);border-radius:20px;font-family:var(--ff-body);font-size:13px;color:var(--ink);outline:none;transition:border-color .2s,background .2s,box-shadow .2s;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.search-wrap input:focus{border-color:rgba(56,189,248,.75);background:rgba(30,41,59,.72);box-shadow:0 0 0 3px rgba(56,189,248,.1)}
+.search-wrap::before{content:'⌕';position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-3);font-size:16px;pointer-events:none}
+.topbar-actions{display:flex;gap:8px}
+.btn-sm{padding:7px 14px;border-radius:var(--radius);font-family:var(--ff-body);font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid rgba(125,211,252,.18);background:rgba(30,41,59,.56);color:var(--ink-2);transition:all .15s;white-space:nowrap;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.btn-sm:hover{background:rgba(56,189,248,.14)}
+.btn-sm.primary{background:var(--red);border-color:var(--red);color:var(--sb-text)}
+.btn-sm.primary:hover{background:var(--red-dk)}
+
+/* STATS */
+#stats-bar{padding:12px 24px;background:rgba(30,41,59,.48);backdrop-filter:blur(14px) saturate(135%);-webkit-backdrop-filter:blur(14px) saturate(135%);border-bottom:1px solid rgba(125,211,252,.14);display:flex;gap:28px;flex-shrink:0;box-shadow:0 10px 24px rgba(2,6,23,.12)}
+.stat-item{text-align:center}
+.stat-num{font-family:var(--ff-head);font-size:22px;color:var(--orange);font-style:italic}
+.stat-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink-3);font-weight:600}
+
+/* FILTERBAR */
+#filterbar{padding:10px 24px;background:rgba(30,41,59,.38);border-bottom:1px solid rgba(125,211,252,.12);display:flex;gap:7px;align-items:center;flex-wrap:wrap;flex-shrink:0;backdrop-filter:blur(14px) saturate(135%);-webkit-backdrop-filter:blur(14px) saturate(135%);box-shadow:0 10px 24px rgba(2,6,23,.1)}
+.filter-chip{padding:5px 13px;border-radius:20px;border:1.5px solid rgba(125,211,252,.18);background:rgba(56,189,248,.12);font-size:12px;color:var(--ink-2);cursor:pointer;transition:all .15s;user-select:none;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+.filter-chip:hover{border-color:var(--orange);color:var(--orange)}
+.filter-chip.active{background:rgba(251,146,60,.25);border-color:var(--red);color:var(--sb-text);font-weight:600}
+select.filter-sel{padding:5px 10px;border-radius:20px;border:1.5px solid rgba(125,211,252,.18);background:rgba(30,41,59,.58);font-family:var(--ff-body);font-size:12px;color:var(--ink-2);cursor:pointer;outline:none;margin-left:auto;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+select.filter-sel:focus{border-color:var(--orange)}
+
+/* GRID */
+#content-area{flex:1;overflow-y:auto;padding:24px}
+#listings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:20px}
+.listing-card{background:rgba(56,189,248,.11);border:1.5px solid rgba(125,211,252,.2);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 18px 50px rgba(2,6,23,.24);cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s,background .2s;animation:fadeUp .3s ease both;backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%)}
+.listing-card:hover{background:rgba(56,189,248,.16);transform:translateY(-3px);box-shadow:0 26px 70px rgba(2,6,23,.34);border-color:var(--orange)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.card-img{width:100%;aspect-ratio:4/3;overflow:hidden;background:var(--paper-3);display:flex;align-items:center;justify-content:center;font-size:48px}
+.card-img img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.listing-card:hover .card-img img{transform:scale(1.04)}
+.card-body{padding:14px}
+.card-cat{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-3);margin-bottom:3px}
+.card-title{font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:7px}
+.card-price{font-family:var(--ff-head);font-size:20px;color:var(--orange);display:flex;align-items:baseline;gap:6px}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--paper-3)}
+.card-seller{display:flex;align-items:center;gap:6px}
+.avatar-sm{width:22px;height:22px;border-radius:50%;background:var(--red);color:var(--sb-text);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.card-seller-name{font-size:11px;color:var(--ink-2)}
+.card-rating{font-size:11px;color:var(--orange);font-weight:600}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.badge-cond{background:var(--green-lt);color:var(--green-dk)}
+.badge-sold{background:var(--red-lt);color:var(--red-dk)}
+.badge-reserved{background:var(--orange-lt);color:var(--red-dk)}
+.badge-negotiable{background:var(--yellow-lt);color:var(--orange)}
+
+/* PANEL */
+#detail-panel{width:0;overflow:hidden;background:rgba(15,23,42,.36);border-left:1.5px solid rgba(125,211,252,.14);transition:width .25s ease;flex-shrink:0;display:flex;flex-direction:column;backdrop-filter:blur(18px) saturate(135%);-webkit-backdrop-filter:blur(18px) saturate(135%)}
+#detail-panel.open{width:var(--panel-w)}
+#panel-inner{width:var(--panel-w);display:flex;flex-direction:column;height:100%}
+#panel-close{position:absolute;top:10px;right:10px;background:rgba(9,20,19,.72);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;color:var(--sb-text);display:flex;align-items:center;justify-content:center;z-index:1}
+.panel-header{position:relative}
+.panel-hero{width:100%;aspect-ratio:1.5;background:rgba(56,189,248,.12);display:flex;align-items:center;justify-content:center;font-size:60px;overflow:hidden}
+.panel-hero img{width:100%;height:100%;object-fit:cover}
+.panel-content{padding:18px 20px;overflow-y:auto;flex:1}
+.panel-cat{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink-3);font-weight:600}
+.panel-title{font-family:var(--ff-head);font-size:22px;margin:3px 0 2px;font-style:italic}
+.panel-price{font-size:26px;font-family:var(--ff-head);color:var(--orange)}
+.panel-meta{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.panel-section{margin-top:16px}
+.panel-section h4{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink-3);margin-bottom:6px;font-weight:600}
+.panel-section p{font-size:13px;color:var(--ink-2);line-height:1.7}
+.seller-card{display:flex;align-items:center;gap:12px;background:rgba(30,41,59,.58);border:1px solid rgba(125,211,252,.16);border-radius:var(--radius);padding:12px;margin-top:10px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.avatar-lg{width:40px;height:40px;border-radius:50%;background:var(--red);color:var(--sb-text);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.seller-info strong{font-size:14px;display:block}
+.seller-info small{font-size:12px;color:var(--ink-3)}
+.tags-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.tag-pill{background:rgba(30,41,59,.55);border:1px solid rgba(125,211,252,.16);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--ink-2);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.panel-actions{padding:14px 18px;border-top:1.5px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.btn-full{width:100%;padding:11px;border-radius:var(--radius);font-family:var(--ff-body);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.btn-full.cta{background:var(--red);color:var(--sb-text)}
+.btn-full.cta:hover{background:var(--red-dk)}
+.btn-full.outline{background:transparent;border:1.5px solid var(--border);color:var(--ink-2)}
+.btn-full.outline:hover{background:var(--paper-2)}
+
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(9,20,19,.55);z-index:2000;display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-box{background:rgba(15,23,42,.48);border:1px solid rgba(125,211,252,.18);border-radius:20px;padding:32px;width:480px;max-width:95vw;box-shadow:0 28px 80px rgba(2,6,23,.42);animation:modalIn .2s ease;max-height:90vh;overflow-y:auto;backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%)}
+@keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.modal-box h3{font-family:var(--ff-head);font-size:22px;margin-bottom:20px;font-style:italic;color:var(--ink)}
+.form-group{margin-bottom:15px}
+.form-group label{display:block;font-size:11px;font-weight:600;color:var(--ink-2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 12px;border:1.5px solid rgba(125,211,252,.18);border-radius:var(--radius);background:rgba(30,41,59,.62);font-family:var(--ff-body);font-size:13px;color:var(--ink);outline:none;transition:border-color .2s,background .2s,box-shadow .2s;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--red)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-actions{display:flex;gap:10px;margin-top:22px}
+.modal-actions button{flex:1}
+.btn-cancel{padding:10px;border-radius:var(--radius);background:rgba(30,41,59,.58);border:1.5px solid rgba(125,211,252,.16);color:var(--ink-2);font-family:var(--ff-body);font-size:13px;cursor:pointer;transition:background .15s;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.btn-cancel:hover{background:rgba(56,189,248,.14)}
+.btn-submit{padding:10px;border-radius:var(--radius);background:var(--red);border:none;color:var(--sb-text);font-family:var(--ff-body);font-size:13px;font-weight:600;cursor:pointer;transition:background .2s}
+.btn-submit:hover{background:var(--red-dk)}
+.icon-picker{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}
+.icon-opt{width:36px;height:36px;border-radius:8px;border:1.5px solid var(--border);background:var(--paper-2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.icon-opt:hover,.icon-opt.active{border-color:var(--red);background:var(--red-lt)}
+
+/* TOAST */
+#toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-60px);background:var(--sb-bg);color:var(--yellow-lt);padding:10px 24px;border-radius:20px;font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);z-index:3000;transition:transform .3s ease;white-space:nowrap}
+#toast.show{transform:translateX(-50%) translateY(0)}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.empty-state{grid-column:1/-1;text-align:center;padding:60px 0;color:var(--ink-3)}
+.empty-state div{font-size:44px;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div id="toast"></div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <h1>MarketMesh</h1>
+      <p>Multi-Community Marketplace</p>
+    </div>
+    <div class="login-tabs">
+      <button class="login-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+      <button class="login-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+    </div>
+    <div class="login-form" id="form-login">
+      <div class="lf-group"><label>Username or Email</label><input type="text" id="li-user" placeholder="Enter username…" /></div>
+      <div class="lf-group"><label>Password</label><input type="password" id="li-pass" placeholder="Enter password…" /></div>
+      <button class="btn-login" onclick="doLogin()">Sign In</button>
+      <p class="login-meta">No account? <a onclick="switchTab('register')">Register here</a></p>
+    </div>
+    <div class="login-form hidden" id="form-register">
+      <div class="lf-group"><label>Full Name</label><input type="text" id="rg-name" placeholder="Your full name" /></div>
+      <div class="lf-group"><label>Username</label><input type="text" id="rg-user" placeholder="Choose a username" /></div>
+      <div class="lf-group"><label>Email</label><input type="email" id="rg-email" placeholder="your@email.com" /></div>
+      <div class="lf-group"><label>Password</label><input type="password" id="rg-pass" placeholder="At least 6 characters" /></div>
+      <button class="btn-login" onclick="doRegister()">Create Account</button>
+      <p class="login-meta">Already registered? <a onclick="switchTab('login')">Sign in</a></p>
+    </div>
+    <div class="login-demo">
+      <div>Quick demo — click to auto-login:</div>
+      <div class="demo-accounts">
+        <div class="demo-chip" onclick="demoLogin('alice_k','pass123')">alice_k</div>
+        <div class="demo-chip" onclick="demoLogin('bob_s','pass123')">bob_s</div>
+        <div class="demo-chip" onclick="demoLogin('carol_n','pass123')">carol_n</div>
+        <div class="demo-chip" onclick="demoLogin('dev_p','pass123')">dev_p</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+  <nav id="sidebar">
+    <div id="sidebar-logo">
+      <div><h1>MarketMesh</h1><small>Marketplace</small></div>
+    </div>
+    <div class="user-pill" id="user-pill">
+      <div class="user-pill-avatar" id="user-avatar-sb">A</div>
+      <div class="user-pill-info">
+        <div class="user-pill-name" id="user-name-sb">alice_k</div>
+        <div class="user-pill-role" id="user-role-sb">Member</div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()" title="Sign out">⏻</button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">
+        <span>Communities</span>
+        <button class="sidebar-label-btn" onclick="openCommModal()" title="Create community">＋</button>
+      </div>
+      <div id="comm-list"></div>
+    </div>
+    <div class="sidebar-footer">
+      <button class="sidebar-btn" onclick="openCommModal()">+ Create a Community</button>
+    </div>
+  </nav>
+
+  <div id="main">
+    <div id="topbar">
+      <div style="min-width:0">
+        <div id="topbar-title">All Communities</div>
+        <div id="topbar-meta"></div>
+      </div>
+      <div class="search-wrap">
+        <input type="text" id="search-input" placeholder="Search listings…" oninput="applyFilters()" />
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-sm primary" onclick="openListingModal()">+ Sell</button>
+      </div>
+    </div>
+    <div id="stats-bar">
+      <div class="stat-item"><div class="stat-num" id="stat-listings">—</div><div class="stat-lbl">Active</div></div>
+      <div class="stat-item"><div class="stat-num" id="stat-members">—</div><div class="stat-lbl">Members</div></div>
+      <div class="stat-item"><div class="stat-num" id="stat-sold">—</div><div class="stat-lbl">Sold</div></div>
+      <div class="stat-item"><div class="stat-num" id="stat-gmv">—</div><div class="stat-lbl">GMV</div></div>
+    </div>
+    <div id="filterbar">
+      <div class="filter-chip active" data-cat="all"         onclick="setFilter('all',this)">All</div>
+      <div class="filter-chip" data-cat="Furniture"         onclick="setFilter('Furniture',this)">🛋 Furniture</div>
+      <div class="filter-chip" data-cat="Books"             onclick="setFilter('Books',this)">📚 Books</div>
+      <div class="filter-chip" data-cat="Electronics"       onclick="setFilter('Electronics',this)">💻 Electronics</div>
+      <div class="filter-chip" data-cat="Photography"       onclick="setFilter('Photography',this)">📷 Photography</div>
+      <div class="filter-chip" data-cat="Fitness"           onclick="setFilter('Fitness',this)">🏋 Fitness</div>
+      <div class="filter-chip" data-cat="Clothing"          onclick="setFilter('Clothing',this)">👕 Clothing</div>
+      <div class="filter-chip" data-cat="Services"          onclick="setFilter('Services',this)">🛠 Services</div>
+      <select class="filter-sel" id="sort-sel" onchange="applyFilters()">
+        <option value="newest">Newest First</option>
+        <option value="price-asc">Price ↑</option>
+        <option value="price-desc">Price ↓</option>
+        <option value="rating">Seller Rating</option>
+      </select>
+    </div>
+    <div style="display:flex;flex:1;overflow:hidden;">
+      <div id="content-area"><div id="listings-grid"></div></div>
+      <div id="detail-panel">
+        <div id="panel-inner">
+          <div class="panel-header">
+            <div class="panel-hero" id="panel-hero"></div>
+            <button id="panel-close" onclick="closePanel()">✕</button>
+          </div>
+          <div class="panel-content" id="panel-content"></div>
+          <div class="panel-actions" id="panel-actions"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LISTING MODAL -->
+<div class="modal-overlay" id="listing-modal">
+  <div class="modal-box">
+    <h3>Post a Listing</h3>
+    <div class="form-group"><label>Title</label><input type="text" id="f-title" placeholder="What are you selling?" /></div>
+    <div class="form-row">
+      <div class="form-group"><label>Price (₹)</label><input type="number" id="f-price" placeholder="0.00" /></div>
+      <div class="form-group"><label>Price Type</label><select id="f-ptype"><option value="fixed">Fixed</option><option value="negotiable">Negotiable</option><option value="free">Free</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Category</label><select id="f-cat"><option value="Furniture">Furniture</option><option value="Books">Books</option><option value="Electronics">Electronics</option><option value="Photography">Photography</option><option value="Fitness">Fitness</option><option value="Clothing">Clothing</option><option value="Services">Services</option></select></div>
+      <div class="form-group"><label>Condition</label><select id="f-cond"><option value="new">New</option><option value="like_new">Like New</option><option value="good">Good</option><option value="fair">Fair</option><option value="poor">Poor</option></select></div>
+    </div>
+    <div class="form-group"><label>Community</label><select id="f-comm"></select></div>
+    <div class="form-group"><label>Description</label><textarea id="f-desc" rows="3" placeholder="Describe your item…"></textarea></div>
+    <div class="form-group"><label>Location / Meetup</label><input type="text" id="f-loc" placeholder="e.g. NIT Campus, Block 7 Lobby…" /></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeListingModal()">Cancel</button>
+      <button class="btn-submit" onclick="submitListing()">Post Listing</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMMUNITY MODAL -->
+<div class="modal-overlay" id="comm-modal">
+  <div class="modal-box">
+    <h3>Create a Community</h3>
+    <div class="form-group"><label>Community Name</label><input type="text" id="cm-name" placeholder="e.g. Tech Swap, Book Club…" maxlength="80" /></div>
+    <div class="form-group"><label>Description</label><textarea id="cm-desc" rows="2" placeholder="What is this community about?"></textarea></div>
+    <div class="form-group"><label>Icon</label><div class="icon-picker" id="icon-picker"></div><input type="hidden" id="cm-icon" value="🏪" /></div>
+    <div class="form-row">
+      <div class="form-group"><label>Visibility</label><select id="cm-vis"><option value="public">Public</option><option value="private">Private</option><option value="invite_only">Invite Only</option></select></div>
+      <div class="form-group"><label>Invite Code</label><input type="text" id="cm-code" readonly style="background:var(--paper-3);cursor:default" /></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeCommModal()">Cancel</button>
+      <button class="btn-submit" onclick="submitCommunity()">Create Community</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// DATA LAYER — now backed by the MySQL API
+// ══════════════════════════════════════════════════════
+const API_BASE = '/api';
+let USERS_DB=[];
+let COMMUNITIES=[];
+let LISTINGS=[];
+let currentUser=null,activeComm=null,activeFilter='all',qcLog=[],authToken=sessionStorage.getItem('marketmesh_token')||'';
+
+function authHeaders(extra={}){
+  const headers={...extra};
+  if(authToken) headers.Authorization=`Bearer ${authToken}`;
+  return headers;
+}
+
+async function apiRequest(path,options={}){
+  const response=await fetch(`${API_BASE}${path}`,{
+    ...options,
+    headers:authHeaders(options.headers||{}),
+  });
+  const contentType=response.headers.get('content-type')||'';
+  const payload=contentType.includes('application/json')?await response.json():await response.text();
+  if(!response.ok){
+    const message=payload&&payload.error?payload.error:(typeof payload==='string'?payload:'Request failed');
+    throw new Error(message);
+  }
+  return payload;
+}
+
+async function loadBootstrap(){
+  const data=await apiRequest('/bootstrap');
+  USERS_DB=data.users||[];
+  COMMUNITIES=data.communities||[];
+  LISTINGS=data.listings||[];
+  if(data.sessionUser){
+    currentUser=data.sessionUser;
+  }
+  return data;
+}
+
+async function bootstrapApp(){
+  await loadBootstrap();
+  renderCommunities();
+  applyFilters();
+  updateStats(null);
+}
+
+// ── AUTH ──────────────────────────────────────────────────────
+function switchTab(tab){
+  document.getElementById('tab-login').classList.toggle('active',tab==='login');
+  document.getElementById('tab-register').classList.toggle('active',tab==='register');
+  document.getElementById('form-login').classList.toggle('hidden',tab!=='login');
+  document.getElementById('form-register').classList.toggle('hidden',tab!=='register');
+}
+
+async function doLogin(){
+  const raw=document.getElementById('li-user').value.trim();
+  const pass=document.getElementById('li-pass').value;
+  try{
+    const data=await apiRequest('/auth/login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({identifier:raw,password:pass}),
+    });
+    await loginSuccess(data.user,data.token);
+  }catch(error){
+    showToast('⚠ '+error.message);
+  }
+}
+
+async function doRegister(){
+  const name=document.getElementById('rg-name').value.trim();
+  const uname=document.getElementById('rg-user').value.trim();
+  const email=document.getElementById('rg-email').value.trim();
+  const pass=document.getElementById('rg-pass').value;
+  if(!name||!uname||!email||!pass){showToast('⚠ All fields required.');return;}
+  if(pass.length<6){showToast('⚠ Password min 6 characters.');return;}
+  try{
+    const data=await apiRequest('/auth/register',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({full_name:name,username:uname,email,password:pass}),
+    });
+    await loginSuccess(data.user,data.token);
+  }catch(error){
+    showToast('⚠ '+error.message);
+  }
+}
+
+function demoLogin(u,p){
+  document.getElementById('li-user').value=u;
+  document.getElementById('li-pass').value=p;
+  switchTab('login');
+  setTimeout(doLogin,80);
+}
+
+async function loginSuccess(user,token){
+  currentUser=user;
+  if(token){
+    authToken=token;
+    sessionStorage.setItem('marketmesh_token',token);
+  }
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('user-avatar-sb').textContent=user.username[0].toUpperCase();
+  document.getElementById('user-name-sb').textContent=user.username;
+  document.getElementById('user-role-sb').textContent=`★ ${user.avg_rating.toFixed(1)} · Member`;
+  showToast('Welcome, '+user.full_name.split(' ')[0]+'!');
+  await bootstrapApp();
+}
+
+async function doLogout(){
+  try{
+    if(authToken){
+      await apiRequest('/auth/logout',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({token:authToken}),
+      });
+    }
+  }catch(_error){}
+  currentUser=null;activeComm=null;activeFilter='all';authToken='';
+  sessionStorage.removeItem('marketmesh_token');
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('li-user').value='';
+  document.getElementById('li-pass').value='';
+  closePanel();
+}
+
+// ── COMMUNITIES ───────────────────────────────────────────────
+function renderCommunities(){
+  const list=document.getElementById('comm-list');
+  let html=`<div class="comm-item ${!activeComm?'active':''}" onclick="selectCommunity(null)">
+    <div class="comm-icon" style="background:var(--sb-muted)">🏪</div>
+    <div class="comm-info"><div class="comm-name">All Communities</div><div class="comm-meta">Browse everything</div></div></div>`;
+  COMMUNITIES.forEach(c=>{
+    html+=`<div class="comm-item ${activeComm===c.id?'active':''}" onclick="selectCommunity(${c.id})">
+      <div class="comm-icon">${resolveCommunityIcon(c)}</div>
+      <div class="comm-info"><div class="comm-name">${c.name}</div><div class="comm-meta">${c.members} members · ${c.listings} listings</div></div></div>`;
+  });
+  list.innerHTML=html;
+}
+
+function resolveCommunityIcon(comm){
+  const raw=String(comm?.icon||'').trim();
+  if(raw && !/^\?+$/.test(raw)) return raw;
+  const name=String(comm?.name||'').toLowerCase();
+  if(name.includes('book')) return '📚';
+  if(name.includes('electronic')||name.includes('tech')) return '💻';
+  if(name.includes('campus')||name.includes('bazaar')) return '🏪';
+  if(name.includes('photo')||name.includes('camera')) return '📷';
+  if(name.includes('sport')||name.includes('fitness')) return '🏋️';
+  return '🏘️';
+}
+
+function selectCommunity(id){
+  activeComm=id;activeFilter='all';
+  document.querySelectorAll('.filter-chip').forEach(el=>el.classList.toggle('active',el.dataset.cat==='all'));
+  renderCommunities();applyFilters();
+  const comm=id?COMMUNITIES.find(c=>c.id===id):null;
+  document.getElementById('topbar-title').textContent=comm?comm.name:'All Communities';
+  document.getElementById('topbar-meta').textContent=comm?`${comm.members} members · ${comm.listings} listings`:`${COMMUNITIES.reduce((a,c)=>a+c.members,0)} members across ${COMMUNITIES.length} communities`;
+  updateStats(comm);closePanel();
+  logQuery(id?`CALL sp_search_listings(${id},NULL,NULL,NULL,NULL,NULL,NULL)`:`SELECT * FROM vw_active_listings ORDER BY created_at DESC`,`${getVisible().length} rows returned`);
+}
+
+// ── ADD COMMUNITY ─────────────────────────────────────────────
+const COMM_ICONS=['🏢','🎓','📷','💻','🏋️','🛋️','📚','🎨','🎵','🌿','🏠','⚽','🎮','🍳','✂️','🔧'];
+
+function openCommModal(){
+  const picker=document.getElementById('icon-picker');
+  picker.innerHTML=COMM_ICONS.map((ic,i)=>`<div class="icon-opt ${i===0?'active':''}" onclick="pickIcon('${ic}',this)">${ic}</div>`).join('');
+  document.getElementById('cm-icon').value=COMM_ICONS[0];
+  document.getElementById('cm-code').value='COMM-'+Math.random().toString(36).slice(2,7).toUpperCase();
+  document.getElementById('cm-name').value='';
+  document.getElementById('cm-desc').value='';
+  document.getElementById('comm-modal').classList.add('show');
+}
+function closeCommModal(){document.getElementById('comm-modal').classList.remove('show')}
+function pickIcon(ic,el){
+  document.querySelectorAll('.icon-opt').forEach(e=>e.classList.remove('active'));
+  el.classList.add('active');document.getElementById('cm-icon').value=ic;
+}
+async function submitCommunity(){
+  const name=document.getElementById('cm-name').value.trim();
+  if(!name){showToast('⚠ Community name required.');return;}
+  const icon=document.getElementById('cm-icon').value;
+  const desc=document.getElementById('cm-desc').value.trim();
+  const vis=document.getElementById('cm-vis').value;
+  const code=document.getElementById('cm-code').value;
+  try{
+    const data=await apiRequest('/communities',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name,description:desc,visibility:vis,icon,invite_code:code}),
+    });
+    closeCommModal();
+    await bootstrapApp();
+    renderCommunities();
+    populateCommDropdown();
+    showToast(`✓ Community "${data.community.name}" created!`);
+    selectCommunity(data.community.id);
+  }catch(error){
+    showToast('⚠ '+error.message);
+  }
+}
+
+// ── FILTERS (FIXED — matches by category name string) ─────────
+function setFilter(cat,el){
+  activeFilter=cat;
+  document.querySelectorAll('.filter-chip').forEach(e=>e.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+  logQuery(
+    cat==='all'
+      ?`SELECT * FROM vw_active_listings${activeComm?` WHERE community_id=${activeComm}`:''} ORDER BY created_at DESC`
+      :`SELECT * FROM vw_active_listings WHERE category='${cat}'${activeComm?` AND community_id=${activeComm}`:''} ORDER BY created_at DESC`,
+    `${getVisible().length} rows`);
+}
+
+function getVisible(){
+  const kw=(document.getElementById('search-input')?.value||'').toLowerCase().trim();
+  return LISTINGS.filter(l=>{
+    if(activeComm&&l.community_id!==activeComm)return false;
+    if(activeFilter!=='all'&&l.category!==activeFilter)return false;
+    if(kw&&!l.title.toLowerCase().includes(kw)&&!l.description.toLowerCase().includes(kw))return false;
+    return true;
+  });
+}
+
+function applyFilters(){
+  const sort=document.getElementById('sort-sel')?.value||'newest';
+  let src=[...getVisible()];
+  if(sort==='price-asc') src.sort((a,b)=>a.price-b.price);
+  if(sort==='price-desc')src.sort((a,b)=>b.price-a.price);
+  if(sort==='rating')    src.sort((a,b)=>b.seller_rating-a.seller_rating);
+  if(sort==='newest')    src.sort((a,b)=>b.id-a.id);
+  renderListings(src);
+}
+
+// ── RENDER LISTINGS ───────────────────────────────────────────
+const catEmoji=c=>({Furniture:'🛋️',Books:'📚',Electronics:'💻',Photography:'📷',Fitness:'🏋️',Clothing:'👕',Services:'🛠️'}[c]||'🏷️');
+
+function renderListings(list){
+  const grid=document.getElementById('listings-grid');
+  if(!list.length){grid.innerHTML=`<div class="empty-state"><div>🔍</div><p>No listings found for this filter.</p></div>`;return;}
+  grid.innerHTML=list.map((l,i)=>`
+    <div class="listing-card" onclick="openPanel(${l.id})" style="animation-delay:${i*.04}s">
+      <div class="card-img">
+        <img src="${l.image}" alt="${l.title}" loading="lazy"
+          onerror="this.parentElement.innerHTML='<span style=font-size:48px>${catEmoji(l.category)}</span>'" />
+      </div>
+      <div class="card-body">
+        <div class="card-cat">${l.category}</div>
+        <div class="card-title">${l.title}</div>
+        <div class="card-price">₹${l.price.toLocaleString('en-IN')}
+          ${l.status!=='active'?`<span class="badge badge-${l.status}">${l.status}</span>`:''}
+          ${l.price_type==='negotiable'?'<span class="badge badge-negotiable">neg</span>':''}
+        </div>
+        <div class="card-footer">
+          <div class="card-seller">
+            <div class="avatar-sm">${l.seller[0].toUpperCase()}</div>
+            <span class="card-seller-name">${l.seller}</span>
+          </div>
+          <span class="card-rating">★ ${l.seller_rating.toFixed(1)}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── DETAIL PANEL ──────────────────────────────────────────────
+function openPanel(id){
+  const l=LISTINGS.find(x=>x.id===id);if(!l)return;
+  logQuery(`SELECT l.*,u.username,u.avg_rating,cat.name AS category,\n  com.name AS community,\n  GROUP_CONCAT(DISTINCT t.name) AS tags,img.image_url\nFROM listing l\nJOIN user u ON l.seller_id=u.user_id\nJOIN community com ON l.community_id=com.community_id\nLEFT JOIN category cat ON l.category_id=cat.category_id\nLEFT JOIN listing_tag lt ON l.listing_id=lt.listing_id\nLEFT JOIN tag t ON lt.tag_id=t.tag_id\nLEFT JOIN listing_image img ON l.listing_id=img.listing_id AND img.is_primary=TRUE\nWHERE l.listing_id=${id}\nGROUP BY l.listing_id`,'1 row returned');
+  document.getElementById('panel-hero').innerHTML=`<img src="${l.image}" alt="${l.title}" onerror="this.parentElement.innerHTML='<span style=font-size:64px>${catEmoji(l.category)}</span>'"/>`;
+  const comm=COMMUNITIES.find(c=>c.id===l.community_id);
+  const seller=USERS_DB.find(u=>u.user_id===l.seller_id);
+  document.getElementById('panel-content').innerHTML=`
+    <div class="panel-cat">${l.category} · ${comm?.name||''}</div>
+    <div class="panel-title">${l.title}</div>
+    <div class="panel-price">₹${l.price.toLocaleString('en-IN')}<span style="font-size:13px;font-family:var(--ff-body);color:var(--ink-3);font-weight:400;">${l.price_type==='negotiable'?' · Negotiable':l.price_type==='free'?' · Free':''}</span></div>
+    <div class="panel-meta">
+      <span class="badge badge-cond">${l.condition.replace('_',' ')}</span>
+      ${l.status!=='active'?`<span class="badge badge-${l.status}">${l.status}</span>`:''}
+      <span class="badge" style="background:var(--paper-2);color:var(--ink-2)">📍 ${l.location}</span>
+    </div>
+    <div class="panel-section"><h4>Description</h4><p>${l.description}</p></div>
+    ${l.tags.length?`<div class="panel-section"><h4>Tags</h4><div class="tags-row">${l.tags.map(t=>`<span class="tag-pill">#${t}</span>`).join('')}</div></div>`:''}
+    <div class="panel-section"><h4>Seller</h4>
+      <div class="seller-card">
+        <div class="avatar-lg">${l.seller[0].toUpperCase()}</div>
+        <div class="seller-info"><strong>${l.seller}</strong><small>★ ${l.seller_rating.toFixed(1)} · ${seller?.full_name||''}</small></div>
+      </div>
+    </div>`;
+  document.getElementById('panel-actions').innerHTML=l.status==='active'
+    ?`<button class="btn-full cta" onclick="markSold(${l.id})">Mark as Sold</button><button class="btn-full outline" onclick="messageSeller(${l.id})">Message Seller</button>`
+    :`<button class="btn-full outline" disabled style="opacity:.5;cursor:default">This listing is ${l.status}</button>`;
+  document.getElementById('detail-panel').classList.add('open');
+}
+function closePanel(){document.getElementById('detail-panel').classList.remove('open')}
+
+function messageSeller(id){
+  const listing=LISTINGS.find(x=>x.id===id);
+  if(!listing){
+    showToast('⚠ Listing not found.');
+    return;
+  }
+  const seller=USERS_DB.find(u=>u.user_id===listing.seller_id);
+  const to=(seller?.email||'').trim();
+  if(!to){
+    showToast('⚠ Seller email not available.');
+    return;
+  }
+
+  const buyerName=currentUser?.full_name||currentUser?.username||'a buyer';
+  const subject=`Interested in ${listing.title}`;
+  const body=`Hi ${seller.full_name||listing.seller},\n\nI am interested in your listing: ${listing.title}.\nPrice: ₹${Number(listing.price||0).toLocaleString('en-IN')}\nCommunity: ${listing.community||''}\n\nPlease let me know if it is still available.\n\nRegards,\n${buyerName}`;
+  const gmailUrl=`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+  window.open(gmailUrl,'_blank','noopener,noreferrer');
+  showToast(`✉ Opening Gmail for ${seller.username||listing.seller}`);
+}
+
+// ── MARK SOLD ─────────────────────────────────────────────────
+async function markSold(id){
+  const l=LISTINGS.find(x=>x.id===id);if(!l||l.status!=='active')return;
+  try{
+    await apiRequest(`/listings/${id}/sold`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({}),
+    });
+    closePanel();
+    await bootstrapApp();
+    applyFilters();
+    updateStats(activeComm?COMMUNITIES.find(c=>c.id===activeComm):null);
+    showToast('✓ Listing marked as sold!');
+  }catch(error){
+    showToast('⚠ '+error.message);
+  }
+}
+
+// ── NEW LISTING MODAL ─────────────────────────────────────────
+function populateCommDropdown(){
+  const sel=document.getElementById('f-comm');if(!sel)return;
+  sel.innerHTML=COMMUNITIES.map(c=>`<option value="${c.id}"${c.id===(activeComm||1)?'selected':''}>${c.name}</option>`).join('');
+}
+function openListingModal(){populateCommDropdown();document.getElementById('listing-modal').classList.add('show')}
+function closeListingModal(){document.getElementById('listing-modal').classList.remove('show')}
+document.getElementById('listing-modal').addEventListener('click',e=>{if(e.target.id==='listing-modal')closeListingModal()});
+document.getElementById('comm-modal').addEventListener('click',e=>{if(e.target.id==='comm-modal')closeCommModal()});
+
+const catImages={
+  Furniture:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80',
+  Books:'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600&q=80',
+  Electronics:'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&q=80',
+  Photography:'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&q=80',
+  Fitness:'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80',
+  Clothing:'https://images.unsplash.com/photo-1562183241-b937e95585b6?w=600&q=80',
+  Services:'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=600&q=80',
+};
+
+async function submitListing(){
+  const title=document.getElementById('f-title').value.trim();
+  const price=parseFloat(document.getElementById('f-price').value);
+  const cat=document.getElementById('f-cat').value;
+  const commId=parseInt(document.getElementById('f-comm').value);
+  if(!title){showToast('⚠ Title required.');return;}
+  if(isNaN(price)){showToast('⚠ Enter a valid price.');return;}
+  try{
+    const payload={
+      title,
+      price,
+      price_type:document.getElementById('f-ptype').value,
+      condition:document.getElementById('f-cond').value,
+      location:document.getElementById('f-loc').value||'TBD',
+      description:document.getElementById('f-desc').value||'No description.',
+      category:cat,
+      community_id:commId,
+      image:catImages[cat]||catImages.Services,
+    };
+    await apiRequest('/listings',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload),
+    });
+    closeListingModal();
+    await bootstrapApp();
+    renderCommunities();
+    applyFilters();
+    updateStats(activeComm?COMMUNITIES.find(c=>c.id===activeComm):null);
+    showToast('✓ Listing posted!');
+    ['f-title','f-price','f-desc','f-loc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  }catch(error){
+    showToast('⚠ '+error.message);
+  }
+}
+
+// ── STATS ─────────────────────────────────────────────────────
+function updateStats(comm){
+  const src=comm?LISTINGS.filter(l=>l.community_id===comm.id):LISTINGS;
+  document.getElementById('stat-listings').textContent=src.filter(l=>l.status==='active').length;
+  document.getElementById('stat-members').textContent=comm?comm.members:COMMUNITIES.reduce((a,c)=>a+c.members,0);
+  document.getElementById('stat-sold').textContent=src.filter(l=>l.status==='sold').length;
+  const gmv=src.filter(l=>l.status==='sold').reduce((a,l)=>a+l.price,0);
+  document.getElementById('stat-gmv').textContent=gmv?'₹'+gmv.toLocaleString('en-IN'):'₹0';
+}
+
+// ── SQL CONSOLE ───────────────────────────────────────────────
+function logQuery(sql,result){
+  if(!sql&&!result)return;
+  qcLog.unshift({sql,result,time:new Date().toLocaleTimeString()});
+  if(qcLog.length>12)qcLog.pop();
+}
+
+
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+async function initApp(){
+  await bootstrapApp();
+}
+
+async function restoreSession(){
+  const token=sessionStorage.getItem('marketmesh_token');
+  if(!token) return;
+  authToken=token;
+  try{
+    const data=await apiRequest('/auth/me');
+    await loginSuccess(data.user,token);
+  }catch(_error){
+    sessionStorage.removeItem('marketmesh_token');
+    authToken='';
+  }
+}
+
+restoreSession();
+</script>
+</body>
+</html>

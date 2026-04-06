@@ -1,0 +1,17 @@
+# Normalize line endings to LF for all files
+* text=auto
+
+# Explicitly set text files to LF
+*.js text eol=lf
+*.json text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.sql text eol=lf
+*.md text eol=lf
+.gitignore text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
