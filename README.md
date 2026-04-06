@@ -176,7 +176,7 @@ ORDER BY total_listings DESC;
 
 ## Course Info
 
-> **Course:** Database Management Systems (DBS)  
+> **Course:** Database Systems (DBS)  
 > **Focus:** ER Modeling, Relational Schema Design, SQL, Stored Procedures, Triggers  
 > **Institution:** *MIT, Manipal*
 
