@@ -12,10 +12,10 @@ A **multi-community marketplace platform** built as a DBMS course project. Users
 ![Login Screen](images/login.jpeg)
 
 <!-- Add a screenshot of the main marketplace dashboard here -->
-![Dashboard](images/dashboard.png)
+![Dashboard](images/dashboard.jpeg)
 
 <!-- Add a screenshot of a listing detail panel here -->
-![Listing Detail](images/listing_detail.png)
+![Listing Detail](images/listing_detail.jpeg)
 
 ---
 
@@ -49,7 +49,7 @@ A **multi-community marketplace platform** built as a DBMS course project. Users
 This project is heavily focused on database design as part of a DBMS course.
 
 <!-- Add the ER diagram image here -->
-![ER Diagram](database/ER_Model.png)
+![ER Diagram](database/ER_Model.jpeg)
 
 ### Schema Highlights
 
