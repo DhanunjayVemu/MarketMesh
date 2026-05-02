@@ -1,4 +1,4 @@
-# MarketMesh 🛍️
+# MarketMesh 
 
 A **multi-community marketplace platform** built as a DBMS course project. Users can join multiple communities (like apartment blocks, university groups, or hobby clubs) and buy/sell items, offer services, and interact within each community's own marketplace.
 
