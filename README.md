@@ -49,7 +49,7 @@ A **multi-community marketplace platform** built as a DBMS course project. Users
 This project is heavily focused on database design as part of a DBMS course.
 
 <!-- Add the ER diagram image here -->
-![ER Diagram](database/ER_Model.jpeg)
+![ER Diagram](images/ER_Model.png)
 
 ### Schema Highlights
 
